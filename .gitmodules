@@ -1,0 +1,3 @@
+[submodule "g2mp"]
+	path = g2mp
+	url = https://github.com/MrDan2345/g2mp.git
