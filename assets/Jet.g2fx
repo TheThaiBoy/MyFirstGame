@@ -1,0 +1,173 @@
+{#g2fx
+ name = "Effect"
+ scale = 1
+ {#atlas
+  {#page
+   texture = "Jet_fx_atlas_0.png"
+   width = 260
+   height = 200
+   {#frame
+    name = "MuzzleFlash.png"
+    pos_l = 2
+    pos_t = 2
+    width = 256
+    height = 128
+   #}
+   {#frame
+    name = "Flare0.png"
+    pos_l = 2
+    pos_t = 134
+    width = 64
+    height = 64
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter"
+  frame = "MuzzleFlash.png"
+  time_start = 0
+  time_end = 0.400000006
+  orientation = 3.141592741
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 0
+  shape_angle = 0.6283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 4
+  layer = 0
+  infinite = 1
+  particle_center_x = 1
+  particle_center_y = 0.5
+  particle_width_min = 2
+  particle_width_max = 2
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 1
+  particle_scale_max = 1
+  particle_duration_min = 0.200000003
+  particle_duration_max = 0.3000000119
+  particle_rotation_min = 0
+  particle_rotation_max = 0
+  particle_rotation_local = 1
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 0
+  particle_velocity_max = 0
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "DstAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Width Graph"
+   guid = "4b3cbb53-42b9-40f1-a639-5546a2193f78"
+   graph_scale = 2
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 2
+    {#point
+     x = 0
+     y = 1
+    #}
+    {#point
+     x = 1
+     y = 1.363636374
+    #}
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter1"
+  frame = "Flare0.png"
+  time_start = 0
+  time_end = 0.173999995
+  orientation = 0
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 0.200000003
+  shape_angle = 6.283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 4
+  layer = 0
+  infinite = 1
+  particle_center_x = 0.5
+  particle_center_y = 0.5
+  particle_width_min = 1
+  particle_width_max = 1
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 1
+  particle_scale_max = 1
+  particle_duration_min = 0.3000002205
+  particle_duration_max = 0.4800002873
+  particle_rotation_min = 0
+  particle_rotation_max = 0
+  particle_rotation_local = 1
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 0
+  particle_velocity_max = 0
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "DstAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Scale Graph"
+   guid = "cc60e497-dce8-4682-81ef-cc0b1865ff8c"
+   graph_scale = 5
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 5
+    {#point
+     x = 0
+     y = 1
+    #}
+    {#point
+     x = 0.656424582
+     y = 2.897727251
+    #}
+   #}
+  #}
+  {#mod
+   name = "Opacity Graph"
+   guid = "df171382-9708-47aa-84e6-728073083b92"
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 1
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.3547486067
+     y = 1
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+ #}
+#}
