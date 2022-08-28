@@ -14,9 +14,6 @@ uses
   Classes;
 
 type
-
-  { TGame }
-
   { TBullet }
 
   TBullet = class (TG2Scene2DEntity)
@@ -30,6 +27,23 @@ type
     procedure OnContact(const EventData: TG2Scene2DEventData);
   end;
 
+  { TEnemy }
+
+  TEnemy = class (TG2Scene2DEntity)
+  private
+    var Sensors: Integer;
+    var AccelAmount: Single;
+    procedure BeginSensor(const EventData: TG2Scene2DEventData);
+    procedure EndSensor(const EventData: TG2Scene2DEventData);
+    procedure OnUpdate;
+  public
+    constructor Create(const OwnerScene: TG2Scene2D); override;
+    destructor Destroy; override;
+    procedure Start;
+  end;
+
+  { TGame }
+
   TGame = class
   protected
   public
@@ -40,6 +54,7 @@ type
     var Background: TG2Scene2DEntity;
     var GroundTouches: Integer;
     var Font1: TG2Font;
+    var Enemy: TEnemy;
     constructor Create;
     destructor Destroy; override;
     procedure Initialize;
@@ -60,6 +75,64 @@ var
   Game: TGame;
 
 implementation
+
+{ TEnemy }
+
+procedure TEnemy.BeginSensor(const EventData: TG2Scene2DEventData);
+begin
+  Sensors += 1;
+end;
+
+procedure TEnemy.EndSensor(const EventData: TG2Scene2DEventData);
+begin
+  Sensors -= 1;
+end;
+
+procedure TEnemy.OnUpdate;
+  var rb: TG2Scene2DComponentRigidBody;
+  var lv: TG2Vec2;
+begin
+  rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
+  if Assigned(rb) then
+  begin
+    if Sensors > 0 then
+    begin
+      lv := rb.LinearVelocity;
+      if lv.y > -4 then rb.ApplyForceToCenter(G2Vec2(0, -100));
+    end;
+  end;
+end;
+
+constructor TEnemy.Create(const OwnerScene: TG2Scene2D);
+begin
+  inherited Create(OwnerScene);
+  g2.CallbackUpdateAdd(@OnUpdate);
+  Sensors := 0;
+  AccelAmount := 0;
+end;
+
+destructor TEnemy.Destroy;
+begin
+  g2.CallbackUpdateRemove(@OnUpdate);
+  inherited Destroy;
+end;
+
+procedure TEnemy.Start;
+  var i: Integer;
+  var rb: TG2Scene2DComponentRigidBody;
+begin
+  rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
+  if Assigned(rb) then
+  begin
+    rb.Enabled := True;
+  end;
+  for i := 0 to ComponentCount - 1 do
+  if Components[i] is TG2Scene2DComponentCollisionShapeBox then
+  begin
+    Components[i].AddEvent('OnBeginContact', @BeginSensor);
+    Components[i].AddEvent('OnEndContact', @EndSensor);
+  end;
+end;
 
 { TBullet }
 
@@ -177,6 +250,11 @@ begin
   Entity.AddEvent('OnEndContact', @WheelEndTouch);
   Scene.Simulate := True;
   Scene.EnablePhysics;
+  Entity := Scene.FindEntityByName('EnemySpawner');
+  if Assigned(Entity) then
+  begin
+    TEnemy(Scene.CreatePrefab('EnemyPrefab.g2prefab2d', Entity.Transform, TEnemy)).Start;
+  end;
 end;
 
 procedure TGame.Finalize;
