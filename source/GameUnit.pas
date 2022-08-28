@@ -237,7 +237,7 @@ begin
   if (Key = G2K_Space) and (GroundTouches > 0) then
   begin
     rb := TG2Scene2DComponentRigidBody(Box.ComponentOfType[TG2Scene2DComponentRigidBody]);
-    rb.ApplyForceToCenter(G2Vec2(0, -2000));
+    rb.ApplyForceToCenter(G2Vec2(0, -10000));
   end;
   if (Key = G2K_R) then
   begin
