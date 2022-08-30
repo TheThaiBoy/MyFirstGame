@@ -11,7 +11,8 @@ uses
   G2Scene2D,
   Types,
   SysUtils,
-  Classes;
+  Classes,
+  Math;
 
 type
   { TBullet }
@@ -91,6 +92,7 @@ end;
 procedure TEnemy.OnUpdate;
   var rb: TG2Scene2DComponentRigidBody;
   var lv: TG2Vec2;
+  var av, t: TG2Float;
 begin
   rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
   if Assigned(rb) then
@@ -100,6 +102,9 @@ begin
       lv := rb.LinearVelocity;
       if lv.y > -4 then rb.ApplyForceToCenter(G2Vec2(0, -100));
     end;
+    t := Power(Rotation.AxisY.Dot(G2Vec2(0, -1)) * 0.5 + 0.5, 3) * Sign(Rotation.AxisY.Dot(G2Vec2(1, 0)));
+    av := Abs(rb.AngularVelocity);
+    rb.ApplyTorque(G2LerpFloat(t, 0, G2Min(Power(av * 0.2, 5), 1)) * 200);
   end;
 end;
 
@@ -239,6 +244,7 @@ begin
   Display.Position := G2Vec2;
   Display.Width := 10;
   Display.Height := 10;
+  Display.Zoom := 0.5;
   Background := Scene.FindEntityByName('background');
   Box := Scene.FindEntityByName('box');
   Gun := Scene.FindEntityByName('Gun');
