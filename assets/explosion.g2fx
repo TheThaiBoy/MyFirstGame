@@ -1,0 +1,497 @@
+{#g2fx
+ name = "bomb goes kaboom"
+ scale = 1
+ {#atlas
+  {#page
+   texture = "explosion_fx_atlas_0.png"
+   width = 392
+   height = 392
+   {#frame
+    name = "Explosion1.png"
+    pos_l = 2
+    pos_t = 2
+    width = 256
+    height = 256
+   #}
+   {#frame
+    name = "MuzzleFlash.png"
+    pos_l = 2
+    pos_t = 262
+    width = 256
+    height = 128
+   #}
+   {#frame
+    name = "Smoke0.png"
+    pos_l = 262
+    pos_t = 2
+    width = 128
+    height = 128
+   #}
+   {#frame
+    name = "kaboom.png"
+    pos_l = 262
+    pos_t = 134
+    width = 128
+    height = 128
+   #}
+   {#frame
+    name = "Flare0.png"
+    pos_l = 262
+    pos_t = 266
+    width = 64
+    height = 64
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter"
+  frame = "kaboom.png"
+  time_start = 0.00400000019
+  time_end = 0.1519999951
+  orientation = 0
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 1
+  shape_angle = 6.283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 1
+  layer = 18
+  infinite = 0
+  particle_center_x = 0.5
+  particle_center_y = 0.5
+  particle_width_min = 1
+  particle_width_max = 1
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 1
+  particle_scale_max = 1
+  particle_duration_min = 1
+  particle_duration_max = 1
+  particle_rotation_min = -0.7853981853
+  particle_rotation_max = 0.7853981853
+  particle_rotation_local = 0
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 0.3600001037
+  particle_velocity_max = 0.3600001037
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "InvSrcAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Opacity Graph"
+   guid = "df171382-9708-47aa-84e6-728073083b92"
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 1
+    {#point
+     x = 0
+     y = 1
+    #}
+    {#point
+     x = 0.3966480196
+     y = 0.4829545617
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+  {#mod
+   name = "Scale Graph"
+   guid = "cc60e497-dce8-4682-81ef-cc0b1865ff8c"
+   graph_scale = 5
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 5
+    {#point
+     x = 0
+     y = 1
+    #}
+    {#point
+     x = 0.1005586535
+     y = 3.920454741
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter1"
+  frame = "Flare0.png"
+  time_start = 0
+  time_end = 0.03200000152
+  orientation = 0
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 0
+  shape_angle = 6.283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 1
+  layer = 17
+  infinite = 0
+  particle_center_x = 0.5
+  particle_center_y = 0.5
+  particle_width_min = 1
+  particle_width_max = 1
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 3.999999285
+  particle_scale_max = 3.999999285
+  particle_duration_min = 0.2400001436
+  particle_duration_max = 0.2400001436
+  particle_rotation_min = 0
+  particle_rotation_max = 0
+  particle_rotation_local = 1
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 0
+  particle_velocity_max = 0
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "DstAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Scale Graph"
+   guid = "cc60e497-dce8-4682-81ef-cc0b1865ff8c"
+   graph_scale = 5
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 5
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.1201117262
+     y = 1.988636374
+    #}
+    {#point
+     x = 0.391061455
+     y = 3.039772749
+    #}
+    {#point
+     x = 0.6340782046
+     y = 3.153409243
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+  {#mod
+   name = "Opacity Graph"
+   guid = "df171382-9708-47aa-84e6-728073083b92"
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 1
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.1340782046
+     y = 1
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter2"
+  frame = "Explosion1.png"
+  time_start = 0.04399999976
+  time_end = 0.1299999356
+  orientation = -6.824350294E-7
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 0
+  shape_angle = 6.283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 1
+  layer = 16
+  infinite = 0
+  particle_center_x = 0.5
+  particle_center_y = 0.5
+  particle_width_min = 1
+  particle_width_max = 1
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 1
+  particle_scale_max = 1
+  particle_duration_min = 0.8199998736
+  particle_duration_max = 0.8199998736
+  particle_rotation_min = -1.884955287
+  particle_rotation_max = 2.010619164
+  particle_rotation_local = 1
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 0
+  particle_velocity_max = 0
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "DstAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Scale Graph"
+   guid = "cc60e497-dce8-4682-81ef-cc0b1865ff8c"
+   graph_scale = 5
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 5
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.2988826632
+     y = 3.096590996
+    #}
+    {#point
+     x = 1
+     y = 5
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+  {#mod
+   name = "Opacity Graph"
+   guid = "df171382-9708-47aa-84e6-728073083b92"
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 1
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.2346368581
+     y = 1
+    #}
+    {#point
+     x = 0.6340782046
+     y = 0.7215909362
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter3"
+  frame = "MuzzleFlash.png"
+  time_start = 0.0120000001
+  time_end = 0.1059999987
+  orientation = 0
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 0.4999999106
+  shape_angle = 6.283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 13
+  layer = 15
+  infinite = 0
+  particle_center_x = 0.5
+  particle_center_y = 0.5
+  particle_width_min = 2
+  particle_width_max = 2
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 0.5
+  particle_scale_max = 0.9000000358
+  particle_duration_min = 1
+  particle_duration_max = 1
+  particle_rotation_min = 0
+  particle_rotation_max = 0
+  particle_rotation_local = 1
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 1.639999151
+  particle_velocity_max = 3.739997387
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "DstAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Scale Graph"
+   guid = "cc60e497-dce8-4682-81ef-cc0b1865ff8c"
+   graph_scale = 5
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 5
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.08379887789
+     y = 0.9375
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+ #}
+ {#emitter
+  name = "Emitter4"
+  frame = "Smoke0.png"
+  time_start = 0.04800000042
+  time_end = 0.09600001574
+  orientation = 0
+  shape = 0
+  shape_radius_0 = 0
+  shape_radius_1 = 1
+  shape_angle = 6.283185482
+  shape_width_0 = 0
+  shape_width_1 = 1
+  shape_height_0 = 0
+  shape_height_1 = 1
+  emission = 3
+  layer = 14
+  infinite = 0
+  particle_center_x = 0.5
+  particle_center_y = 0.5
+  particle_width_min = 1
+  particle_width_max = 1
+  particle_height_min = 1
+  particle_height_max = 1
+  particle_scale_min = 1
+  particle_scale_max = 1
+  particle_duration_min = 1
+  particle_duration_max = 1
+  particle_rotation_min = 0
+  particle_rotation_max = 6.283185482
+  particle_rotation_local = 0
+  particle_orientation_min = 0
+  particle_orientation_max = 0
+  particle_velocity_min = 0
+  particle_velocity_max = 1
+  particle_color_0 = "FFFFFF"
+  particle_color_1 = "FFFFFF"
+  particle_opacity = 1
+  {#blend_mode
+   ColorSrc = "SrcAlpha"
+   ColorDst = "InvSrcAlpha"
+   AlphaSrc = "One"
+   AlphaDst = "One"
+  #}
+  {#mod
+   name = "Opacity Graph"
+   guid = "df171382-9708-47aa-84e6-728073083b92"
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 1
+    {#point
+     x = 0
+     y = 0
+    #}
+    {#point
+     x = 0.06703910232
+     y = 1
+    #}
+    {#point
+     x = 0.5111731887
+     y = 0.8465909362
+    #}
+    {#point
+     x = 0.8212290406
+     y = 0.4318181872
+    #}
+    {#point
+     x = 1
+     y = 0
+    #}
+   #}
+  #}
+  {#mod
+   name = "Scale Graph"
+   guid = "cc60e497-dce8-4682-81ef-cc0b1865ff8c"
+   graph_scale = 7.5
+   {#graph
+    x_min = 0
+    x_max = 1
+    y_min = 0
+    y_max = 7.5
+    {#point
+     x = 0
+     y = 1.534090996
+    #}
+    {#point
+     x = 0.2346368581
+     y = 4.261363506
+    #}
+    {#point
+     x = 0.5446926951
+     y = 5.625
+    #}
+    {#point
+     x = 1
+     y = 6.903409004
+    #}
+   #}
+  #}
+ #}
+#}
