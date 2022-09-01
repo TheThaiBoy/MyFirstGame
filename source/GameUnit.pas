@@ -15,6 +15,20 @@ uses
   Math;
 
 type
+
+  { TEnemyBomb }
+
+  TEnemyBomb = class (TG2Scene2DEntity)
+  private
+    var LifeTime: TG2Float;
+    procedure OnUpdate;
+    procedure BeginCollision(const EventData: TG2Scene2DEventData);
+  public
+    constructor Create(const OwnerScene: TG2Scene2D); override;
+    destructor Destroy; override;
+    procedure Start;
+  end;
+
   { TBullet }
 
   TBullet = class (TG2Scene2DEntity)
@@ -34,6 +48,7 @@ type
   private
     var Sensors: Integer;
     var AccelAmount: Single;
+    var DropBombTimer: Single;
     procedure BeginSensor(const EventData: TG2Scene2DEventData);
     procedure EndSensor(const EventData: TG2Scene2DEventData);
     procedure OnUpdate;
@@ -77,6 +92,64 @@ var
 
 implementation
 
+{ TEnemyBomb }
+
+procedure TEnemyBomb.OnUpdate;
+  var i: Integer;
+  var d: Single;
+  var v: TG2Vec2;
+  var rb: TG2Scene2DComponentRigidBody;
+begin
+  LifeTime -= g2.DeltaTimeSec;
+  if LifeTime <= 0 then
+  begin
+    Scene.CreatePrefab('Explosion.g2prefab2d', G2Transform2(Transform.p, G2Rotation2));
+    for i := 0 to Scene.EntityCount - 1 do
+    begin
+      rb := TG2Scene2DComponentRigidBody(Scene.Entities[i].ComponentOfType[TG2Scene2DComponentRigidBody]);
+      if Assigned(rb) and (rb.BodyType = g2_s2d_rbt_dynamic_body) then
+      begin
+        v := Scene.Entities[i].Transform.p - Transform.p;
+        d := G2Min(1 - v.Len * 0.1, 1);
+        if d > 0 then
+        begin
+          rb.ApplyForceToCenter(v.Norm * d * 500);
+        end;
+      end;
+    end;
+    Free;
+  end;
+end;
+
+procedure TEnemyBomb.BeginCollision(const EventData: TG2Scene2DEventData);
+begin
+  LifeTime := 0;
+end;
+
+constructor TEnemyBomb.Create(const OwnerScene: TG2Scene2D);
+begin
+  inherited Create(OwnerScene);
+  LifeTime := 5;
+  g2.CallbackUpdateAdd(@OnUpdate);
+end;
+
+destructor TEnemyBomb.Destroy;
+begin
+  g2.CallbackUpdateRemove(@OnUpdate);
+  inherited Destroy;
+end;
+
+procedure TEnemyBomb.Start;
+  var rb: TG2Scene2DComponentRigidBody;
+begin
+  rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
+  if Assigned(rb) then
+  begin
+    rb.Enabled := True;
+  end;
+  AddEvent('OnBeginContact', @BeginCollision);
+end;
+
 { TEnemy }
 
 procedure TEnemy.BeginSensor(const EventData: TG2Scene2DEventData);
@@ -93,6 +166,8 @@ procedure TEnemy.OnUpdate;
   var rb: TG2Scene2DComponentRigidBody;
   var lv: TG2Vec2;
   var av, t: TG2Float;
+  var Bomb: TEnemyBomb;
+  const DropBombDelay = 5;
 begin
   rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
   if Assigned(rb) then
@@ -106,6 +181,13 @@ begin
     av := Abs(rb.AngularVelocity);
     rb.ApplyTorque(G2LerpFloat(t, 0, G2Min(Power(av * 0.2, 5), 1)) * 200);
   end;
+  if DropBombTimer < DropBombDelay then DropBombTimer += g2.DeltaTimeSec;
+  if DropBombTimer >= DropBombDelay then
+  begin
+    Bomb := TEnemyBomb(Scene.CreatePrefab('bomb.g2prefab2d', Transform, TEnemyBomb));
+    Bomb.Start;
+    DropBombTimer := 0;
+  end;
 end;
 
 constructor TEnemy.Create(const OwnerScene: TG2Scene2D);
@@ -114,6 +196,7 @@ begin
   g2.CallbackUpdateAdd(@OnUpdate);
   Sensors := 0;
   AccelAmount := 0;
+  DropBombTimer := 0;
 end;
 
 destructor TEnemy.Destroy;
