@@ -85,7 +85,7 @@ type
   public
     var Scene: TG2Scene2D;
     var Display: TG2Display2D;
-    var Box: TG2Scene2DEntity;
+    var Player: TG2Scene2DEntity;
     var Gun: TG2Scene2DEntity;
     var Background: TG2Scene2DEntity;
     var GroundTouches: Integer;
@@ -220,6 +220,7 @@ procedure TEnemy.OnUpdate;
   var lv: TG2Vec2;
   var av, t: TG2Float;
   var Bomb: TEnemyBomb;
+  var xf: TG2Transform2;
   const DropBombDelay = 5;
 begin
   inherited OnUpdate;
@@ -234,6 +235,17 @@ begin
     t := Power(Rotation.AxisY.Dot(G2Vec2(0, -1)) * 0.5 + 0.5, 3) * Sign(Rotation.AxisY.Dot(G2Vec2(1, 0)));
     av := Abs(rb.AngularVelocity);
     rb.ApplyTorque(G2LerpFloat(t, 0, G2Min(Power(av * 0.2, 5), 1)) * 200);
+    if Assigned(Game.Player) then
+    begin
+      if Game.Player.Position.x - 5 > Position.x then
+      begin
+        rb.ApplyForceToCenter(G2Vec2(100,0));
+      end
+      else if Game.Player.Position.x + 5 < Position.x then
+      begin
+        rb.ApplyForceToCenter(G2Vec2(-100,0));
+      end;
+    end;
   end;
   if DropBombTimer < DropBombDelay then DropBombTimer += g2.DeltaTimeSec;
   if DropBombTimer >= DropBombDelay then
@@ -242,7 +254,12 @@ begin
     Bomb.Start;
     DropBombTimer := 0;
   end;
-  if IsDead then Free;
+  if IsDead then
+  begin
+    xf := G2Transform2(Position, G2Rotation2);
+    Scene.CreatePrefab('EnemyDead.g2prefab2d', xf);
+    Free;
+  end;
 end;
 
 constructor TEnemy.Create(const OwnerScene: TG2Scene2D);
@@ -341,7 +358,7 @@ begin
   Hittable := THittable(e.ComponentOfType[THittable]);
   if Assigned(Hittable) then
   begin
-    Hittable.Hit(10);
+    Hittable.Hit(20);
   end;
 end;
 
@@ -392,7 +409,7 @@ begin
   Display.Height := 10;
   Display.Zoom := 0.5;
   Background := Scene.FindEntityByName('background');
-  Box := Scene.FindEntityByName('box');
+  Player := Scene.FindEntityByName('box');
   Gun := Scene.FindEntityByName('Gun');
   Entity := Scene.FindEntityByName('Wheel0');
   Entity.AddEvent('OnBeginContact', @WheelBeginTouch);
@@ -424,7 +441,7 @@ procedure TGame.Update;
   var rot: TG2Rotation2;
   const Velocity = 10;
 begin
-  Display.Position := Box.Position;
+  Display.Position := Player.Position;
   Background.Position := Display.Position;
   rot.AxisX := (Display.CoordToDisplay(g2.MousePos) - Gun.Position).Norm;
   Gun.Rotation := rot;
@@ -466,7 +483,7 @@ procedure TGame.KeyDown(const Key: Integer);
 begin
   if (Key = G2K_Space) and (GroundTouches > 0) then
   begin
-    rb := TG2Scene2DComponentRigidBody(Box.ComponentOfType[TG2Scene2DComponentRigidBody]);
+    rb := TG2Scene2DComponentRigidBody(Player.ComponentOfType[TG2Scene2DComponentRigidBody]);
     rb.ApplyForceToCenter(G2Vec2(0, -2000));
   end;
   if (Key = G2K_R) then
@@ -476,7 +493,7 @@ begin
     Wheel1 := Scene.FindEntityByName('Wheel1');
     if Assigned(Start) and Assigned(Wheel0) and Assigned(Wheel1) then
     begin
-      rb := TG2Scene2DComponentRigidBody(Box.ComponentOfType[TG2Scene2DComponentRigidBody]);
+      rb := TG2Scene2DComponentRigidBody(Player.ComponentOfType[TG2Scene2DComponentRigidBody]);
       rbw0 := TG2Scene2DComponentRigidBody(Wheel0.ComponentOfType[TG2Scene2DComponentRigidBody]);
       rbw1 := TG2Scene2DComponentRigidBody(Wheel1.ComponentOfType[TG2Scene2DComponentRigidBody]);
       for i := 0 to Scene.JointCount - 1 do
@@ -496,8 +513,8 @@ begin
       rbw0.Enabled := False;
       rbw1.Enabled := False;
       rb.Enabled := False;
-      Box.Position := Start.Position;
-      Box.Rotation := 0;
+      Player.Position := Start.Position;
+      Player.Rotation := 0;
       rb.Enabled := True;
       rbw0.Enabled := True;
       rbw1.Enabled := True;
