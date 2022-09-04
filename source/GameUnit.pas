@@ -105,6 +105,7 @@ begin
   begin
     Scene.CreatePrefab('Explosion.g2prefab2d', G2Transform2(Transform.p, G2Rotation2));
     for i := 0 to Scene.EntityCount - 1 do
+    if not (Scene.Entities[i] is TBullet) then
     begin
       rb := TG2Scene2DComponentRigidBody(Scene.Entities[i].ComponentOfType[TG2Scene2DComponentRigidBody]);
       if Assigned(rb) and (rb.BodyType = g2_s2d_rbt_dynamic_body) then
