@@ -16,6 +16,25 @@ uses
 
 type
 
+  { TBaseEntity }
+
+  TBaseEntity = class (TG2Scene2DEntity)
+  protected
+    function IsDead: Boolean;
+    procedure OnUpdate; virtual;
+  end;
+
+  { THittable }
+
+  THittable = class (TG2Scene2DComponent)
+  private
+    var Health: Integer;
+  public
+    constructor Create(const OwnerScene: TG2Scene2D); override;
+    procedure Hit(const Damage: Integer);
+    function IsDead: Boolean;
+  end;
+
   { TEnemyBomb }
 
   TEnemyBomb = class (TG2Scene2DEntity)
@@ -44,14 +63,15 @@ type
 
   { TEnemy }
 
-  TEnemy = class (TG2Scene2DEntity)
+  TEnemy = class (TBaseEntity)
   private
     var Sensors: Integer;
     var AccelAmount: Single;
     var DropBombTimer: Single;
     procedure BeginSensor(const EventData: TG2Scene2DEventData);
     procedure EndSensor(const EventData: TG2Scene2DEventData);
-    procedure OnUpdate;
+  protected
+    procedure OnUpdate; override;
   public
     constructor Create(const OwnerScene: TG2Scene2D); override;
     destructor Destroy; override;
@@ -91,6 +111,38 @@ var
   Game: TGame;
 
 implementation
+
+{ TBaseEntity }
+
+function TBaseEntity.IsDead: Boolean;
+  var Hittable: THittable;
+begin
+  Hittable := THittable(ComponentOfType[THittable]);
+  if Assigned(Hittable) then Result := Hittable.IsDead;
+end;
+
+procedure TBaseEntity.OnUpdate;
+begin
+
+end;
+
+{ THittable }
+
+constructor THittable.Create(const OwnerScene: TG2Scene2D);
+begin
+  inherited Create(OwnerScene);
+  Health := 100;
+end;
+
+procedure THittable.Hit(const Damage: Integer);
+begin
+  Health -= Damage;
+end;
+
+function THittable.IsDead: Boolean;
+begin
+  Result := Health <= 0;
+end;
 
 { TEnemyBomb }
 
@@ -170,6 +222,7 @@ procedure TEnemy.OnUpdate;
   var Bomb: TEnemyBomb;
   const DropBombDelay = 5;
 begin
+  inherited OnUpdate;
   rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
   if Assigned(rb) then
   begin
@@ -189,6 +242,7 @@ begin
     Bomb.Start;
     DropBombTimer := 0;
   end;
+  if IsDead then Free;
 end;
 
 constructor TEnemy.Create(const OwnerScene: TG2Scene2D);
@@ -198,6 +252,7 @@ begin
   Sensors := 0;
   AccelAmount := 0;
   DropBombTimer := 0;
+  THittable.Create(Scene).Attach(Self);
 end;
 
 destructor TEnemy.Destroy;
@@ -268,6 +323,7 @@ procedure TBullet.OnContact(const EventData: TG2Scene2DEventData);
   var p: TG2Scene2DComponentEffect;
   var Data: TG2Scene2DEventBeginContactData;
   var xf: TG2Transform2;
+  var Hittable: THittable;
 begin
   Data := TG2Scene2DEventBeginContactData(EventData);
   LifeTime := 100;
@@ -280,6 +336,12 @@ begin
     p.Scale := 0.2;
     p.Speed := 2;
     p.AutoDestruct := True;
+  end;
+  e := Data.Entities[1];
+  Hittable := THittable(e.ComponentOfType[THittable]);
+  if Assigned(Hittable) then
+  begin
+    Hittable.Hit(10);
   end;
 end;
 
