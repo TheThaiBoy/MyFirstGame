@@ -20,6 +20,7 @@ type
 
   TBaseEntity = class (TG2Scene2DEntity)
   protected
+    procedure Die;
     function IsDead: Boolean;
     procedure OnUpdate; virtual;
   end;
@@ -91,6 +92,9 @@ type
     var GroundTouches: Integer;
     var Font1: TG2Font;
     var Enemy: TEnemy;
+    var EnemySpawnTime: Single;
+    var EnemyCount: Integer;
+    var ShootTime: Single;
     constructor Create;
     destructor Destroy; override;
     procedure Initialize;
@@ -105,6 +109,7 @@ type
     procedure Print(const c: AnsiChar);
     procedure WheelBeginTouch(const EventData: TG2Scene2DEventData);
     procedure WheelEndTouch(const EventData: TG2Scene2DEventData);
+    procedure Shoot;
   end;
 
 var
@@ -113,6 +118,13 @@ var
 implementation
 
 { TBaseEntity }
+
+procedure TBaseEntity.Die;
+  var Hittable: THittable;
+begin
+  Hittable := THittable(ComponentOfType[THittable]);
+  if Assigned(Hittable) then Hittable.Health := 0;
+end;
 
 function TBaseEntity.IsDead: Boolean;
   var Hittable: THittable;
@@ -147,6 +159,16 @@ end;
 { TEnemyBomb }
 
 procedure TEnemyBomb.OnUpdate;
+  function CheckPushType(const c: TClass): Boolean;
+    const IgnoreTypes: array [0..1] of CG2Scene2DEntity = (
+      TBullet, TEnemyBomb
+    );
+    var i: Integer;
+  begin
+    for i := 0 to High(IgnoreTypes) do
+    if IgnoreTypes[i] = c then Exit(False);
+    Result := True;
+  end;
   var i: Integer;
   var d: Single;
   var v: TG2Vec2;
@@ -157,7 +179,7 @@ begin
   begin
     Scene.CreatePrefab('Explosion.g2prefab2d', G2Transform2(Transform.p, G2Rotation2));
     for i := 0 to Scene.EntityCount - 1 do
-    if not (Scene.Entities[i] is TBullet) then
+    if CheckPushType(Scene.Entities[i].ClassType) then
     begin
       rb := TG2Scene2DComponentRigidBody(Scene.Entities[i].ComponentOfType[TG2Scene2DComponentRigidBody]);
       if Assigned(rb) and (rb.BodyType = g2_s2d_rbt_dynamic_body) then
@@ -221,7 +243,7 @@ procedure TEnemy.OnUpdate;
   var av, t: TG2Float;
   var Bomb: TEnemyBomb;
   var xf: TG2Transform2;
-  const DropBombDelay = 5;
+  const DropBombDelay = 4.41234;
 begin
   inherited OnUpdate;
   rb := TG2Scene2DComponentRigidBody(ComponentOfType[TG2Scene2DComponentRigidBody]);
@@ -239,11 +261,11 @@ begin
     begin
       if Game.Player.Position.x - 5 > Position.x then
       begin
-        rb.ApplyForceToCenter(G2Vec2(100,0));
+        if rb.LinearVelocity.x < 10 then rb.ApplyForceToCenter(G2Vec2(100,0));
       end
       else if Game.Player.Position.x + 5 < Position.x then
       begin
-        rb.ApplyForceToCenter(G2Vec2(-100,0));
+        if rb.LinearVelocity.x > -10 then rb.ApplyForceToCenter(G2Vec2(-100,0));
       end;
     end;
   end;
@@ -253,6 +275,10 @@ begin
     Bomb := TEnemyBomb(Scene.CreatePrefab('bomb.g2prefab2d', Transform, TEnemyBomb));
     Bomb.Start;
     DropBombTimer := 0;
+  end;
+  if Assigned(Game.Player) and ((Game.Player.Position - Position).Len > 500) then
+  begin
+    Die;
   end;
   if IsDead then
   begin
@@ -270,10 +296,12 @@ begin
   AccelAmount := 0;
   DropBombTimer := 0;
   THittable.Create(Scene).Attach(Self);
+  Game.EnemyCount += 1;
 end;
 
 destructor TEnemy.Destroy;
 begin
+  Game.EnemyCount -= 1;
   g2.CallbackUpdateRemove(@OnUpdate);
   inherited Destroy;
 end;
@@ -350,7 +378,7 @@ begin
   p := TG2Scene2DComponentEffect(e.ComponentOfType[TG2Scene2DComponentEffect]);
   if Assigned(p) then
   begin
-    p.Scale := 0.2;
+    p.Scale := 0.6;
     p.Speed := 2;
     p.AutoDestruct := True;
   end;
@@ -419,11 +447,9 @@ begin
   Entity.AddEvent('OnEndContact', @WheelEndTouch);
   Scene.Simulate := True;
   Scene.EnablePhysics;
-  Entity := Scene.FindEntityByName('EnemySpawner');
-  if Assigned(Entity) then
-  begin
-    TEnemy(Scene.CreatePrefab('EnemyPrefab.g2prefab2d', Entity.Transform, TEnemy)).Start;
-  end;
+  EnemyCount := 0;
+  EnemySpawnTime := 0;
+  ShootTime := 0;
 end;
 
 procedure TGame.Finalize;
@@ -435,7 +461,7 @@ begin
 end;
 
 procedure TGame.Update;
-  var Wheel: TG2Scene2DEntity;
+  var Wheel, Entity: TG2Scene2DEntity;
   var rb: TG2Scene2DComponentRigidBody;
   var Speed: TG2Float;
   var rot: TG2Rotation2;
@@ -465,6 +491,21 @@ begin
     Wheel := Scene.FindEntityByName('Wheel0');
     rb := TG2Scene2DComponentRigidBody(Wheel.ComponentOfType[TG2Scene2DComponentRigidBody]);
     rb.ApplyTorque(Speed);
+  end;
+  if EnemySpawnTime > 0 then EnemySpawnTime -= g2.DeltaTimeSec;
+  if (EnemyCount < 10) and (EnemySpawnTime <= 0) then
+  begin
+    Entity := Scene.FindEntityByName('EnemySpawner');
+    if Assigned(Entity) then
+    begin
+      TEnemy(Scene.CreatePrefab('EnemyPrefab.g2prefab2d', Entity.Transform, TEnemy)).Start;
+    end;
+    EnemySpawnTime := 5;
+  end;
+  if ShootTime > 0 then ShootTime -= g2.DeltaTimeSec;
+  if g2.MouseDown[G2MB_Left] and (ShootTime <= 0) then
+  begin
+    Shoot;
   end;
 end;
 
@@ -532,16 +573,8 @@ begin
 end;
 
 procedure TGame.MouseDown(const Button, x, y: Integer);
-  var b: TBullet;
-  var xf: TG2Transform2;
 begin
-  if Button = G2MB_Left then
-  begin
-    xf := Gun.Transform;
-    xf.p := xf.p + Gun.Rotation.AxisX * 0.2;
-    b := TBullet(Scene.CreatePrefab('Bullet.g2prefab2d', xf, TBullet));
-    b.Start;
-  end;
+
 end;
 
 procedure TGame.MouseUp(const Button, x, y: Integer);
@@ -576,6 +609,19 @@ begin
     Dec(GroundTouches);
   end;
 end;
+
+procedure TGame.Shoot;
+  var b: TBullet;
+  var xf: TG2Transform2;
+begin
+  ShootTime := 0.2;
+  xf := Gun.Transform;
+  xf.p := xf.p + Gun.Rotation.AxisX * 0.2;
+  xf.r.Angle := xf.r.Angle + (Random - 0.5) * 0.2;
+  b := TBullet(Scene.CreatePrefab('Bullet.g2prefab2d', xf, TBullet));
+  b.Start;
+end;
+
 //TGame END
 
 end.
