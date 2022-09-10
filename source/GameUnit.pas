@@ -84,6 +84,7 @@ type
   TGame = class
   protected
   public
+    var DownSampleRT: TG2Texture2DRT;
     var Scene: TG2Scene2D;
     var Display: TG2Display2D;
     var Player: TG2Scene2DEntity;
@@ -427,6 +428,8 @@ end;
 procedure TGame.Initialize;
   var Entity: TG2Scene2DEntity;
 begin
+  DownSampleRT := TG2Texture2DRT.Create;
+  DownSampleRT.Make(256, 128);
   Font1 := TG2Font.Create;
   Font1.Make(16);
   Scene := TG2Scene2D.Create;
@@ -457,6 +460,7 @@ begin
   Scene.Free;
   Display.Free;
   Font1.Free;
+  DownSampleRT.Free;
   Free;
 end;
 
@@ -511,7 +515,17 @@ end;
 
 procedure TGame.Render;
 begin
+  g2.RenderTarget := DownSampleRT;
+  Display.ViewPort := Rect(0, 0, DownSampleRT.Width, DownSampleRT.Height);
   Scene.Render(Display);
+  g2.RenderTarget := nil;
+  Display.ViewPort := Rect(0, 0, g2.Params.Width, g2.Params.Height);
+  g2.PicRect(
+    (g2.Params.Width - g2.Params.Height * 2) * 0.5,
+    (g2.Params.Height - g2.Params.Height) * 0.5,
+    g2.Params.Height * 2, g2.Params.Height,
+    $ffffffff, DownSampleRT, bmNormal
+  );
   Font1.Print(10, 10, 'Touches = ' + IntToStr(GroundTouches));
 end;
 
