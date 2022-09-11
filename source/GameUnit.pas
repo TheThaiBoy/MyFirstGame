@@ -96,6 +96,7 @@ type
     var EnemySpawnTime: Single;
     var EnemyCount: Integer;
     var ShootTime: Single;
+    var Pixely: Boolean;
     constructor Create;
     destructor Destroy; override;
     procedure Initialize;
@@ -108,8 +109,8 @@ type
     procedure MouseUp(const Button, x, y: Integer);
     procedure Scroll(const y: Integer);
     procedure Print(const c: AnsiChar);
-    procedure WheelBeginTouch(const EventData: TG2Scene2DEventData);
-    procedure WheelEndTouch(const EventData: TG2Scene2DEventData);
+    procedure PlayerBeginTouch(const EventData: TG2Scene2DEventData);
+    procedure PlayerEndTouch(const EventData: TG2Scene2DEventData);
     procedure Shoot;
   end;
 
@@ -408,6 +409,7 @@ begin
   g2.Params.Width := 1024;
   g2.Params.Height := 768;
   g2.Params.ScreenMode := smMaximized;
+  Pixely := False;
 end;
 
 destructor TGame.Destroy;
@@ -444,11 +446,13 @@ begin
   Player := Scene.FindEntityByName('box');
   Gun := Scene.FindEntityByName('Gun');
   Entity := Scene.FindEntityByName('Wheel0');
-  Entity.AddEvent('OnBeginContact', @WheelBeginTouch);
-  Entity.AddEvent('OnEndContact', @WheelEndTouch);
+  Entity.AddEvent('OnBeginContact', @PlayerBeginTouch);
+  Entity.AddEvent('OnEndContact', @PlayerEndTouch);
   Entity := Scene.FindEntityByName('Wheel1');
-  Entity.AddEvent('OnBeginContact', @WheelBeginTouch);
-  Entity.AddEvent('OnEndContact', @WheelEndTouch);
+  Entity.AddEvent('OnBeginContact', @PlayerBeginTouch);
+  Entity.AddEvent('OnEndContact', @PlayerEndTouch);
+  Player.AddEvent('OnBeginContact', @PlayerBeginTouch);
+  Player.AddEvent('OnEndContact', @PlayerEndTouch);
   Scene.Simulate := True;
   Scene.EnablePhysics;
   EnemyCount := 0;
@@ -516,17 +520,23 @@ end;
 
 procedure TGame.Render;
 begin
-  g2.RenderTarget := DownSampleRT;
-  Display.ViewPort := Rect(0, 0, DownSampleRT.Width, DownSampleRT.Height);
+  if Pixely then
+  begin
+    g2.RenderTarget := DownSampleRT;
+    Display.ViewPort := Rect(0, 0, DownSampleRT.Width, DownSampleRT.Height);
+  end;
   Scene.Render(Display);
-  g2.RenderTarget := nil;
-  Display.ViewPort := Rect(0, 0, g2.Params.Width, g2.Params.Height);
-  g2.PicRect(
-    (g2.Params.Width - g2.Params.Height * 2) * 0.5,
-    (g2.Params.Height - g2.Params.Height) * 0.5,
-    g2.Params.Height * 2, g2.Params.Height,
-    $ffffffff, DownSampleRT, bmNormal
-  );
+  if Pixely then
+  begin
+    g2.RenderTarget := nil;
+    Display.ViewPort := Rect(0, 0, g2.Params.Width, g2.Params.Height);
+    g2.PicRect(
+      (g2.Params.Width - g2.Params.Height * 2) * 0.5,
+      (g2.Params.Height - g2.Params.Height) * 0.5,
+      g2.Params.Height * 2, g2.Params.Height,
+      $ffffffff, DownSampleRT, bmNormal
+    );
+  end;
   Font1.Print(10, 10, 'Touches = ' + IntToStr(GroundTouches));
 end;
 
@@ -607,7 +617,7 @@ begin
 
 end;
 
-procedure TGame.WheelBeginTouch(const EventData: TG2Scene2DEventData);
+procedure TGame.PlayerBeginTouch(const EventData: TG2Scene2DEventData);
   var Data: TG2Scene2DEventBeginContactData absolute EventData;
 begin
   if Data.Entities[1].Name = 'ground' then
@@ -616,7 +626,7 @@ begin
   end;
 end;
 
-procedure TGame.WheelEndTouch(const EventData: TG2Scene2DEventData);
+procedure TGame.PlayerEndTouch(const EventData: TG2Scene2DEventData);
   var Data: TG2Scene2DEventEndContactData absolute EventData;
 begin
   if Data.Entities[1].Name = 'ground' then
