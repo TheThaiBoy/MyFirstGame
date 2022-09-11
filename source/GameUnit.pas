@@ -428,6 +428,7 @@ end;
 procedure TGame.Initialize;
   var Entity: TG2Scene2DEntity;
 begin
+  g2.Window.Caption := 'MyFirstGame!';
   DownSampleRT := TG2Texture2DRT.Create;
   DownSampleRT.Make(256, 128);
   Font1 := TG2Font.Create;
